@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>APIRateLimiter</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="grid"></div>
+
+<div class="app">
+
+    <header>
+
+        <div class="brand">
+
+            <div class="logo">A</div>
+
+            <div>
+                <h1>APIRateLimiter</h1>
+                <p>Production-style API protection</p>
+            </div>
+
+        </div>
+
+        <div class="algo">
+            <span></span>
+            TOKEN BUCKET
+        </div>
+
+    </header>
+
+
+    <section class="hero">
+
+        <div>
+
+            <div class="eyebrow">
+                API GATEWAY • RATE CONTROL
+            </div>
+
+            <h2>
+                Protect your API.<br>
+                <em>Control every request.</em>
+            </h2>
+
+            <p>
+                Generate a rate-limited proxy endpoint powered by
+                the Token Bucket algorithm.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <main>
+
+        <!-- CREATE PROTECTED API -->
+
+        <section class="card">
+
+            <div class="heading">
+
+                <div>
+                    <small>01 / CONFIGURE</small>
+                    <h3>Create Protected API</h3>
+                </div>
+
+                <span class="icon">↗</span>
+
+            </div>
+
+
+            <div class="form">
+
+                <label>ORIGINAL API ENDPOINT</label>
+
+                <input
+                        id="url"
+                        type="url"
+                        placeholder="https://api.example.com/users"
+                >
+
+
+                <div class="row">
+
+                    <div>
+
+                        <label>BUCKET CAPACITY</label>
+
+                        <input
+                                id="capacity"
+                                type="number"
+                                min="1"
+                                placeholder="10"
+                        >
+
+                        <span class="field-hint">
+                            Maximum tokens stored
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <label>
+                            REFILL RATE
+                            <span>tokens / sec</span>
+                        </label>
+
+                        <input
+                                id="refillRate"
+                                type="number"
+                                min="0"
+                                step="0.1"
+                                placeholder="2"
+                        >
+
+                        <span class="field-hint">
+                            Tokens added per second
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                        id="generateBtn"
+                        onclick="generateAPI()"
+                >
+                    Generate Protected URL
+                    <b>→</b>
+                </button>
+
+            </div>
+
+
+            <div
+                    id="generated"
+                    class="generated hidden"
+            >
+
+                <label>YOUR PROTECTED ENDPOINT</label>
+
+                <div class="url">
+
+                    <span id="protectedUrl"></span>
+
+                    <button onclick="copyURL()">
+                        COPY
+                    </button>
+
+                </div>
+
+                <div id="copyMessage"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TEST PROTECTED API -->
+
+        <section class="card">
+
+            <div class="heading">
+
+                <div>
+
+                    <small>02 / LIVE TEST</small>
+
+                    <h3>Token Bucket Monitor</h3>
+
+                </div>
+
+                <div class="live">
+                    <span></span>
+                    LIVE
+                </div>
+
+            </div>
+
+
+            <div class="monitor">
+
+
+                <div class="token-panel">
+
+                    <div>
+
+                        <label>AVAILABLE TOKENS</label>
+
+                        <div class="tokens">
+
+                            <strong id="tokens">—</strong>
+
+                            <span>
+                                /
+                                <b id="capacityDisplay">—</b>
+                            </span>
+
+                        </div>
+
+
+                        <div class="bar">
+
+                            <div id="tokenBar"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                            class="state"
+                            id="statusDot"
+                    ></div>
+
+                </div>
+
+
+                <div class="stats">
+
+
+                    <div>
+
+                        <span>REFILL RATE</span>
+
+                        <strong id="refillDisplay">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>LAST REQUEST</span>
+
+                        <strong id="latency">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>NEXT REFILL</span>
+
+                        <strong id="nextRefill">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <button
+                        id="checkBtn"
+                        class="check"
+                        onclick="checkAPI()"
+                        disabled
+                >
+
+                    <span>
+                        CHECK PROTECTED API
+                    </span>
+
+                    <b>↗</b>
+
+                </button>
+
+
+                <div
+                        id="response"
+                        class="response"
+                >
+
+                    <span>
+                        Waiting for your first request...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <span>APIRateLimiter</span>
+
+        <span>Token Bucket Algorithm</span>
+
+        <span>Java • Spring Boot</span>
+
+    </footer>
+
+</div>
+
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>

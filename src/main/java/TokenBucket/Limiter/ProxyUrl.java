@@ -26,9 +26,15 @@ public class ProxyUrl {
                         model.getRefillRate()
                 );
 
-        urlMap.put(proxyId, model.getUrl());
+        urlMap.put(
+                proxyId,
+                model.getUrl()
+        );
 
-        bucketMap.put(proxyId, bucket);
+        bucketMap.put(
+                proxyId,
+                bucket
+        );
 
         return proxyId;
     }

@@ -43,8 +43,16 @@ public class TokenBucketLogic {
         lastRefillTime = currentTime;
     }
 
-    public synchronized double getTokens() {
+    public synchronized double getRemainingTokens() {
         refill();
         return tokens;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public double getRefillRate() {
+        return refillRate;
     }
 }
