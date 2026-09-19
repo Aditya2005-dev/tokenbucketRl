@@ -1,5 +1,6 @@
 package TokenBucket.Limiter;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,8 @@ public class Controller {
 
     @PostMapping("/protect")
     public ResponseEntity<?> createProtectedUrl(
-            @RequestBody Model model) {
+            @RequestBody Model model,
+            HttpServletRequest request) {
 
         if (model.getUrl() == null ||
                 model.getUrl().isBlank()) {
@@ -46,7 +48,11 @@ public class Controller {
                 proxyUrl.createProxy(model);
 
         String protectedUrl =
-                "http://localhost:8080/proxy/" + proxyId;
+                request.getRequestURL()
+                        .toString()
+                        .replace("/api/protect", "")
+                        + "/proxy/"
+                        + proxyId;
 
         return ResponseEntity.ok(
                 Map.of(
