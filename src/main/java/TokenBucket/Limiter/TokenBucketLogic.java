@@ -8,6 +8,7 @@ public class TokenBucketLogic {
     private long lastRefillTime;
 
     public TokenBucketLogic(int capacity, double refillRate) {
+
         this.capacity = capacity;
         this.tokens = capacity;
         this.refillRate = refillRate;
@@ -30,16 +31,20 @@ public class TokenBucketLogic {
 
         long currentTime = System.currentTimeMillis();
 
-        long elapsedTime = currentTime - lastRefillTime;
+        long elapsedTime =
+                currentTime - lastRefillTime;
 
-        double newTokens = (elapsedTime / 1000.0) * refillRate;
+        double newTokens =
+                (elapsedTime / 1000.0) * refillRate;
 
-        tokens = Math.min(capacity, tokens + newTokens);
+        tokens =
+                Math.min(capacity, tokens + newTokens);
 
         lastRefillTime = currentTime;
     }
 
-    public double getTokens() {
+    public synchronized double getTokens() {
+        refill();
         return tokens;
     }
 }

@@ -1,24 +1,24 @@
 package TokenBucket.Limiter;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-@RestController
-@RequestMapping("/api")
+@Service
 public class ProxyUrl {
 
-    private final Map<String, String> urlMap = new HashMap<>();
-    private final Map<String, TokenBucketLogic> bucketMap = new HashMap<>();
+    private final Map<String, String> urlMap =
+            new ConcurrentHashMap<>();
 
-    @PostMapping("/protect")
-    public String createProxy(@RequestBody Model model) {
+    private final Map<String, TokenBucketLogic> bucketMap =
+            new ConcurrentHashMap<>();
 
-        String proxyId = UUID.randomUUID().toString();
+    public String createProxy(Model model) {
 
-        urlMap.put(proxyId, model.getUrl());
+        String proxyId =
+                UUID.randomUUID().toString();
 
         TokenBucketLogic bucket =
                 new TokenBucketLogic(
@@ -26,12 +26,14 @@ public class ProxyUrl {
                         model.getRefillRate()
                 );
 
+        urlMap.put(proxyId, model.getUrl());
+
         bucketMap.put(proxyId, bucket);
 
-        return "http://localhost:8080/proxy/" + proxyId;
+        return proxyId;
     }
 
-    public String getUrl(String proxyId) {
+    public String getOriginalUrl(String proxyId) {
         return urlMap.get(proxyId);
     }
 

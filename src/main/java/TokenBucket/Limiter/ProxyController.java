@@ -1,22 +1,26 @@
 package TokenBucket.Limiter;
 
+import java.util.Map;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
+@CrossOrigin("*")
 public class ProxyController {
 
     private final ProxyUrl proxyUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate =
+            new RestTemplate();
 
     public ProxyController(ProxyUrl proxyUrl) {
         this.proxyUrl = proxyUrl;
     }
 
     @GetMapping("/proxy/{proxyId}")
-    public ResponseEntity<String> handleRequest(
+    public ResponseEntity<String> proxyRequest(
             @PathVariable String proxyId) {
 
         TokenBucketLogic bucket =
@@ -25,18 +29,19 @@ public class ProxyController {
         if (bucket == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Proxy URL not found");
+                    .body("Protected URL not found");
         }
 
-        // Rate-limit check
+        // Token Bucket check
         if (!bucket.allowRequest()) {
+
             return ResponseEntity
                     .status(HttpStatus.TOO_MANY_REQUESTS)
                     .body("Rate limit exceeded");
         }
 
-        // Get original URL
-        String originalUrl = proxyUrl.getUrl(proxyId);
+        String originalUrl =
+                proxyUrl.getOriginalUrl(proxyId);
 
         try {
 
@@ -54,58 +59,26 @@ public class ProxyController {
 
             return ResponseEntity
                     .status(HttpStatus.BAD_GATEWAY)
-                    .body("Unable to reach target API");
+                    .body("Unable to reach original API");
         }
     }
 
-    @PostMapping("/proxy/{proxyId}")
-public ResponseEntity<String> handlePostRequest(
-        @PathVariable String proxyId,
-        @RequestBody String requestBody) {
+    @GetMapping("/proxy/{proxyId}/status")
+    public ResponseEntity<?> getStatus(
+            @PathVariable String proxyId) {
 
-    TokenBucketLogic bucket =
-            proxyUrl.getBucket(proxyId);
+        TokenBucketLogic bucket =
+                proxyUrl.getBucket(proxyId);
 
-    if (bucket == null) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("Proxy URL not found");
-    }
+        if (bucket == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-    // Check rate limit
-    if (!bucket.allowRequest()) {
-        return ResponseEntity
-                .status(HttpStatus.TOO_MANY_REQUESTS)
-                .body("Rate limit exceeded");
-    }
-
-    // Get original URL
-    String originalUrl = proxyUrl.getUrl(proxyId);
-
-    try {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> request =
-                new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response =
-                restTemplate.postForEntity(
-                        originalUrl,
-                        request,
-                        String.class
-                );
-
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response.getBody());
-
-    } catch (Exception e) {
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_GATEWAY)
-                .body("Unable to reach target API");
-    }
+        return ResponseEntity.ok(
+                Map.of(
+                        "tokens",
+                        bucket.getTokens()
+                )
+        );
     }
 }
