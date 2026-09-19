@@ -1,0 +1,37 @@
+name: APIRateLimiter CI
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Build application
+        run: mvn clean package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t api-rate-limiter .
